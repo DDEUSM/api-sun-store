@@ -13,9 +13,9 @@ routes.get("/search/:state/:category/:sub_category", controller_ads.search);
 //routes.get("/search/:state/:category/:sub_category", controller_ads.searchSubCategory);
 
 
-routes.get("/count/:state", controller_count_results.PandAdsCount);
-routes.get("/count/:state/:category", controller_count_results.PandAdsCategoryCount);
-routes.get("/count/:state/:category/:sub_category", controller_count_results.PandAdsSubCategoryCount);
+routes.get("/count/:state/:category/:sub_category", controller_count_results.PandUserAdCount);
+//routes.get("/count/:state/:category", controller_count_results.PandAdsCategoryCount);
+//routes.get("/count/:state/:category/:sub_category", controller_count_results.PandAdsSubCategoryCount);
 
 // State routes
 

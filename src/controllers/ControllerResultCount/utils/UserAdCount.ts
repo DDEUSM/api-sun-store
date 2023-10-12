@@ -50,10 +50,6 @@ export default
         return obj_query;
     },
 
-    skipItemsConfig: (itemsPerPage: any, pageQuery: any) => {
-        return itemsPerPage * (pageQuery - 1);
-    },
-
     requestDataCount: async(items_per_page: any,obj_query: any) => {        
         const resultCount = await Ads.find(obj_query)
         .count()

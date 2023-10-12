@@ -48,7 +48,7 @@ export default
         try 
         {                
             if(thisUser.favorite_ads){
-                thisUser.favorite_ads.push(thisAd._id);
+                thisUser.favorite_ads.push(thisAd);
                 await thisUser.save();
                 await thisAd.updateOne({$inc : {'likes' : 1}});                         
                 return "Anúncio favoritado";
@@ -65,7 +65,12 @@ export default
     deslikeAd : async({thisUser, thisAd }: any) => {           
         try
         {
-            thisUser.favorite_ads.splice(thisAd._id, 1);
+            let FindIndex = thisUser.favorite_ads.findIndex((item: any) => item._id === thisAd._id);
+            if(FindIndex < 0)
+            {
+                return;
+            }
+            thisUser.favorite_ads.splice(FindIndex, 1);
             await thisUser.save();       
             await thisAd.updateOne({$inc : {"likes": -1}});
             return "Anúncio desfavoritado";     

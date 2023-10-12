@@ -101,24 +101,20 @@ async function PandUserAdCount( request: Request, response: Response, next: Next
     const {
         state,
         category,
-        subCategory
+        sub_category
     } = request.params;    
     
     const userId = request.query.userId;
-    const title  = request.query.title;    
-    const pageQuery = parseInt(request.query.page as string); 
+    const title  = request.query.title;        
     const maxPrice = request.query.max_price; // Me certificar de nunca enviar valor nulo
-    const minPrice = request.query.min_price;
-    const sort = request.query.order as string;        
+    const minPrice = request.query.min_price;            
     
-    const priceFilterConfig = utils.priceFilterConfig(minPrice as string, maxPrice as string);
-    const sortConfig = utils.sortConfig(sort); // Não posso enviar um undefined para sort
-    const skipItemsConfig = utils.skipItemsConfig(items_per_page, pageQuery);
+    const priceFilterConfig = utils.priceFilterConfig(minPrice as string, maxPrice as string);    
 
     const executeProcess = new Promise((resolve,) => resolve(utils.queryParamsConfig(
         state,
         category, 
-        subCategory,
+        sub_category,
         userId,
         title,
         priceFilterConfig,
