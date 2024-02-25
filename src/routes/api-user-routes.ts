@@ -2,7 +2,8 @@ import { Router } from 'express';
 import controller_user from '../controllers/controller-user';
 import controller_user_ads from '../controllers/Controller.UserAndAd/controller_user_ads';
 import controller_ads from '../controllers/ControllerAds';
-import { generateNewToken, privateRoute } from '../config/passport';
+import { generateNewToken, privateRoute } from '../controllers/config/passport';
+import { upload } from '../controllers/config/upload_multer';
 
 const userRoutes = Router();
 
@@ -25,6 +26,8 @@ userRoutes.get("/search/:state/:category", controller_ads.searchCategory);
 userRoutes.get("/search/:state/:category/:sub_category", controller_ads.searchSubCategory);
 
 userRoutes.post('/user/favorite-or-desfavorite-ad', controller_user_ads.favoriteOrDesfavoriteAd );
+
+userRoutes.post('/user/upload-profile-image/:id', upload.single("profileImage") ,controller_user.uploadProfileImage);
 
 //user_routes.post('/user/deslike-ads' ,controller_user_ads.deslikeAds );
 

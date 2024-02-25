@@ -4,16 +4,17 @@ import dotenv from 'dotenv';
 import dayjs from 'dayjs';
 import { ExtractJwt, Strategy as JWTStrategy } from 'passport-jwt';
 import Jwt, { verify } from 'jsonwebtoken';
-import users from '../models/User';
-import RefreshToken from '../models/RefreshToken';
+import users from '../../models/User';
+import RefreshToken from '../../models/RefreshToken';
 import { ObjectId } from 'mongodb';
+import env from '../../env';
 
 dotenv.config();
 const notAuthorizedJson = { status : 401, message : 'Not authorized Json token' };
 
 const options = {
     jwtFromRequest : ExtractJwt.fromAuthHeaderAsBearerToken(),
-    secretOrKey : process.env.JWT_SECRET as string
+    secretOrKey : env.JWT_SECRET as string
 };
 
 passport.use(new JWTStrategy(options, async (payload, done) => {
@@ -23,7 +24,7 @@ passport.use(new JWTStrategy(options, async (payload, done) => {
 }));
 
 export function generateToken(data : Object){
-    return Jwt.sign(data, process.env.JWT_SECRET as string, {
+    return Jwt.sign(data, env.JWT_SECRET as string, {
         expiresIn : '40s'
     });
 };

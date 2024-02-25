@@ -7,12 +7,12 @@ import runMongo from './instances/mongo-instance';
 import connect_database from './instances/mongo-cluster-instance';
 import passport from 'passport';
 import userRoutes from './routes/api-user-routes';
+import env from './env';
 
-
-dotenv.config();
 
 const server = express();
-connect_database();
+//connect_database();
+runMongo();
 server.use(express.static(path.join(__dirname, '../public')));
 server.use(express.urlencoded({ extended : true }))
 server.use(express.json())
@@ -36,4 +36,4 @@ const errorHandler : ErrorRequestHandler = (err, req, res, next) => {
         res.json({ error : 'Ocorreu algum erro' })    
 };
 server.use( errorHandler );
-server.listen(process.env.PORT, () => console.log(`link: http://localhost:${process.env.PORT}`));
+server.listen(env.PORT, () => console.log(`link: http://localhost:${env.PORT}`));

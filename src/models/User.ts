@@ -4,6 +4,9 @@ import { Schema, model } from "mongoose";
 interface Iuser {
     name : string;
     email : string;
+    birth : string;
+    cpf: string;
+    sex: "masculino" | "feminino";
     password_hash : string;
     refresh_token? : ObjectId; 
     state : string;
@@ -14,6 +17,9 @@ interface Iuser {
 const UserSchema = new Schema<Iuser>({
     name : { type : String },
     email : { type : String },
+    birth : { type : String },
+    cpf: { type: String},
+    sex: { type: String },
     password_hash : { type : String },
     refresh_token : { type : ObjectId },
     state : { type : String },

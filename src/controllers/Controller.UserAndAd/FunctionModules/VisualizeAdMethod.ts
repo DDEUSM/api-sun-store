@@ -21,7 +21,8 @@ export default
             console.log(error);
             const serverError = { status: 500, message: "Ocorreu algum erro no servidor."}
             throw new Error(JSON.stringify(serverError));
-        });                    
+        });    
+                        
         if(userAndAdExists)
         {
             console.log("Este usuário já visualizou este anúncio");

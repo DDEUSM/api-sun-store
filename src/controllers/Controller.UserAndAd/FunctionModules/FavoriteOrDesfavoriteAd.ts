@@ -26,12 +26,13 @@ export default
                 Ads.findById(ids.adId),
             ]);         
             const[thisUser, thisAd] = requests;
+
             if(!(thisUser && thisAd))
             {
                 const notAuthorized = { status: 422, message: "Algum parâmetro errado."}
                 throw new Error(JSON.stringify(notAuthorized));                    
             }                               
-            if(thisUser.favorite_ads.includes(ids.adId))
+            if(thisUser.favorite_ads.includes(thisAd._id))
             {
                 return {thisUser, thisAd, userHasLikedBefore: true};                    
             }
@@ -46,14 +47,11 @@ export default
 
     favoriteAd : async({thisUser, thisAd }: any) => {
         try 
-        {                
-            if(thisUser.favorite_ads){
-                thisUser.favorite_ads.push(thisAd);
-                await thisUser.save();
-                await thisAd.updateOne({$inc : {'likes' : 1}});                         
-                return "Anúncio favoritado";
-            }
-            return "";
+        {                            
+            thisUser.favorite_ads.push(thisAd._id);
+            await thisUser.save();
+            await thisAd.updateOne({$inc : {'likes' : 1}});                         
+            return "Anúncio favoritado";                        
         } 
         catch (error)             
         {                         
@@ -64,8 +62,8 @@ export default
 
     deslikeAd : async({thisUser, thisAd }: any) => {           
         try
-        {
-            let FindIndex = thisUser.favorite_ads.findIndex((item: any) => item._id === thisAd._id);
+        {            
+            let FindIndex = thisUser.favorite_ads.findIndex((adId: ObjectId) => adId.equals(thisAd._id));                    
             if(FindIndex < 0)
             {
                 return;

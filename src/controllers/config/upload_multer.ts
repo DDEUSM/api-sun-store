@@ -1,11 +1,22 @@
 import multer from 'multer';
+import fs from 'fs';
+
 
 const storage_config = multer.diskStorage({
-    destination : (req, file, cb) => {
+    destination : (req, file, cb) => {        
         if(file.fieldname === 'product-images'){
             cb(null, './public/images/product-test');
-        }else if(file.fieldname === 'profile-image'){
-            cb(null, './public/images/profile-test');
+        }else if(file.fieldname === 'profileImage'){
+            fs.access("./public/temp-images", (error) => 
+            {
+                if (error)
+                {
+                    fs.mkdirSync("./public/temp-images");
+                }
+            });
+            cb(null, './public/temp-images');
+
+            //cb(null, './public/images/users');
         }
     },
     filename : (req, file, cb) => {

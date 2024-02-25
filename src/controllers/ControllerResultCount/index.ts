@@ -26,7 +26,7 @@ async function PandAdsCount(req: Request, res: Response)
     const tot_pages = Number.isInteger(possible_float)? 
     possible_float:Math.floor(possible_float) + 1;
     res.json({ count_items : count_result, tot_pages });
-};
+}
 
 
 async function PandAdsCategoryCount(req: Request, res: Response)
@@ -68,11 +68,6 @@ async function PandAdsSubCategoryCount(req: Request, res: Response)
     min_price? price_config.$gte = parseFloat(min_price) : null;
     max_price? price_config.$lte = parseFloat(max_price) : null;
 
-    //TESTE DE VERIFICAÇÃO DOS DADOS ANTES DO PROCESSAMENTO
-    console.log('params: ' + req.params );
-    console.log('queries string: ' + req.query);
-    ///////////
-
     let obj = { 
         'address.state' : state_param === 'Todos'? '':{$regex : state_param, $options : 'i'},
         'category.sub_category.name' : { $regex : sub_category_param, $options : "i" },
@@ -84,17 +79,13 @@ async function PandAdsSubCategoryCount(req: Request, res: Response)
         return accumulator;
     }, {});
 
-    //TESTE DE VERIFICAÇÃO DOS DADOS PÓS-PROCESSAMENTO
-    console.log("pós-processamento: ");
-    console.log(obj_query);
-    //////////////////
-
     const count_result = await ads.find(obj_query).count();
     const possible_float = count_result / items_per_page;   
     const tot_pages = Number.isInteger(possible_float)? 
     possible_float:Math.floor(possible_float) + 1;
     res.json({ count_items : count_result, tot_pages });   
-};
+}
+
 
 async function PandUserAdCount( request: Request, response: Response, next: NextFunction )
 {
