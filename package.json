@@ -2,7 +2,6 @@
   "name": "api-sun-store",
   "version": "1.0.0",
   "description": "",
-  
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon -e ts,json src/server.ts",
@@ -48,6 +47,7 @@
     "@types/nodemon": "^1.19.2",
     "@types/passport": "^1.0.12",
     "@types/passport-jwt": "^3.0.9",
+    "compress-images": "^2.0.5",
     "ts-node": "^10.9.1",
     "typescript": "^5.1.6"
   }

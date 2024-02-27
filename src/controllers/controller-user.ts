@@ -7,6 +7,7 @@ import { adaptDateToDatabase, capitalizeWords } from '../utils';
 import mongoose from 'mongoose';
 import { ObjectId } from 'mongodb';
 import env from '../env';
+import { compressImages } from './config/imageCompressor';
 
 async function getAllUsers( req : Request, res : Response )
 {        
@@ -127,8 +128,15 @@ async function uploadProfileImage(req: Request, res: Response)
 {
     const { file } = req;
     const { id } = req.params;
+    
+    const inputPath = "public/temp-images/"+file?.filename;
+    const outputPath = "public/images/users/"; 
+    const rawName = file?.filename.split(".")[0] as string;    
 
-    await User.findByIdAndUpdate(id, { profile_img: `http://${env.ADDRESS}:${env.PORT}\\${file?.path.replace("public\\", "")}` })
+    const finalImageUrl = compressImages(inputPath, outputPath, rawName);
+
+    const formatedUrl = (finalImageUrl.replaceAll("/", "\\")).replace("public\\", "")
+    await User.findByIdAndUpdate(id, { profile_img: `http://${env.ADDRESS}:${env.PORT}\\${formatedUrl}`})
 }
 
 export default { getAllUsers, getUser, createNewUser, userLogin, uploadProfileImage };
