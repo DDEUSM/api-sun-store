@@ -3,10 +3,10 @@ import { generateRefreshToken, generateToken } from './config/passport';
 import bcrypt from 'bcrypt';
 import users from '../models/User';
 import User from '../models/User';
+import env from '../env';
 import { adaptDateToDatabase, capitalizeWords } from '../utils';
 import mongoose from 'mongoose';
 import { ObjectId } from 'mongodb';
-import env from '../env';
 import { compressImages } from './config/imageCompressor';
 
 async function getAllUsers( req : Request, res : Response )
@@ -68,7 +68,8 @@ async function createNewUser( req : Request, res : Response )
         sex,
         email : email_lower_case,
         password_hash,
-        state
+        state,
+        profile_img: `http://${env.ADDRESS}:${env.PORT}/images/users/default.jpg`
     });
 
     new_user._id = new ObjectId()
@@ -137,6 +138,8 @@ async function uploadProfileImage(req: Request, res: Response)
 
     const formatedUrl = (finalImageUrl.replaceAll("/", "\\")).replace("public\\", "")
     await User.findByIdAndUpdate(id, { profile_img: `http://${env.ADDRESS}:${env.PORT}\\${formatedUrl}`})
+
+    return res.status(200).json()
 }
 
 export default { getAllUsers, getUser, createNewUser, userLogin, uploadProfileImage };

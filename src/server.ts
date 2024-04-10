@@ -8,6 +8,7 @@ import connect_database from './instances/mongo-cluster-instance';
 import passport from 'passport';
 import userRoutes from './routes/api-user-routes';
 import env from './env';
+import { MulterError } from 'multer';
 
 
 const server = express();
@@ -26,14 +27,17 @@ server.use((req : Request, res : Response) => {
     res.json({error : 'Endpoint não encontrado!'});
 });
 const errorHandler : ErrorRequestHandler = (err, req, res, next) => {
-    err.status? 
-        res.status(err.status)
-    :
-        res.status(400)
-    err.message?
-        res.json({ error : err.message })
-    :
-        res.json({ error : 'Ocorreu algum erro' })    
-};
+    if (err instanceof MulterError)
+    {
+       return res.status(400)
+            .json({ error : "File is too large!" })
+            .end()
+    }
+    else
+    {
+        return res.status(err.status? err.status : 500)
+            .json(err.message? { error: err.message } : { error: "Ocorreu um erro inesperado!"})
+    } 
+}
 server.use( errorHandler );
 server.listen(env.PORT, () => console.log(`link: http://localhost:${env.PORT}`));
