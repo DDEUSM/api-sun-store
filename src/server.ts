@@ -3,7 +3,6 @@ import path from 'path';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import routes from './routes/api-routes';
-import runMongo from './instances/mongo-instance';
 import connect_database from './instances/mongo-cluster-instance';
 import passport from 'passport';
 import userRoutes from './routes/api-user-routes';
@@ -12,8 +11,8 @@ import { MulterError } from 'multer';
 
 
 const server = express();
-//connect_database();
-runMongo();
+connect_database();
+
 server.use(express.static(path.join(__dirname, '../public')));
 server.use(express.urlencoded({ extended : true }))
 server.use(express.json())
