@@ -28,7 +28,8 @@ server.use((req : Request, res : Response) => {
 const errorHandler : ErrorRequestHandler = (err, req, res, next) => {
     if (err instanceof MulterError)
     {
-       return res.status(400)
+        console.log(err)
+        return res.status(400)
             .json({ error : "File is too large!" })
             .end()
     }

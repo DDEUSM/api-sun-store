@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import ads from '../../models/Ads';
-import { items_per_page } from '../items_per_page';
+import { ITEMS_PER_PAGE } from '../global-data';
 import utils from './utils/UserAdCount';
 
 async function PandAdsCount(req: Request, res: Response)
@@ -22,7 +22,7 @@ async function PandAdsCount(req: Request, res: Response)
         return accumulator;
     }, {});         
     const count_result = await ads.find(obj_query).count();
-    const possible_float = count_result / items_per_page;   
+    const possible_float = count_result / ITEMS_PER_PAGE;   
     const tot_pages = Number.isInteger(possible_float)? 
     possible_float:Math.floor(possible_float) + 1;
     res.json({ count_items : count_result, tot_pages });
@@ -50,7 +50,7 @@ async function PandAdsCategoryCount(req: Request, res: Response)
         return accumulator;
     }, {});         
     const count_result = await ads.find(obj_query).count();
-    const possible_float = count_result / items_per_page;   
+    const possible_float = count_result / ITEMS_PER_PAGE;   
     const tot_pages = Number.isInteger(possible_float)? 
     possible_float:Math.floor(possible_float) + 1;
     res.json({ count_items : count_result, tot_pages });    
@@ -80,7 +80,7 @@ async function PandAdsSubCategoryCount(req: Request, res: Response)
     }, {});
 
     const count_result = await ads.find(obj_query).count();
-    const possible_float = count_result / items_per_page;   
+    const possible_float = count_result / ITEMS_PER_PAGE;   
     const tot_pages = Number.isInteger(possible_float)? 
     possible_float:Math.floor(possible_float) + 1;
     res.json({ count_items : count_result, tot_pages });   
@@ -112,7 +112,7 @@ async function PandUserAdCount( request: Request, response: Response, next: Next
     )))
 
     await executeProcess
-    .then( objectQuery => utils.requestDataCount(items_per_page, objectQuery))
+    .then( objectQuery => utils.requestDataCount(ITEMS_PER_PAGE, objectQuery))
     .then(resultQuery => response.json(resultQuery))
     .catch(error => {
         const errorReason: string = error.toString().slice(6);  

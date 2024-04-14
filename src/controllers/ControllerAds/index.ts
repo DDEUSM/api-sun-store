@@ -1,9 +1,29 @@
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Request, Response, query } from "express";
 import ads from "../../models/Ads";
-import { items_per_page } from "../items_per_page";
+import { ITEMS_PER_PAGE, ITEM_SORT } from "../global-data";
 import User from "../../models/User";
 import utils from "./utils";
+import { imageUrlDestiny } from "../../utils";
+import { adAdapterToDb } from "./ad-adapters";
+import Ads from "../../models/Ads";
 
+
+async function createAd (req: Request, res: Response, next: NextFunction)
+{    
+    const file = req.file
+    const adData = req.body
+
+    const inputPath = "public/temp-images/products/"+file?.filename
+    const outputPath = "public/images/products/"
+
+    const imageUrl = imageUrlDestiny(inputPath, outputPath, file)
+    adData.url_image = imageUrl
+
+    const adaptedData = adAdapterToDb(adData)
+
+    const newAd = new Ads(adaptedData)
+    await newAd.save()
+}
 
 async function singleAds( req: Request, res: Response, next: NextFunction )
 { 
@@ -32,134 +52,72 @@ async function getAllAds( req: Request, res: Response )
 
 
 async function search( request: Request, response: Response, next: NextFunction )
-{    
-    const {
-        state,
-        category,
-        sub_category
-    } = request.params;    
-    
-    const userId = request.query.userId;
-    const title  = request.query.title;    
-    const pageQuery = parseInt(request.query.page as string); 
-    const maxPrice = request.query.max_price; // Me certificar de nunca enviar valor nulo
-    const minPrice = request.query.min_price;
-    const sort = request.query.order as string;        
-    
-    const priceFilterConfig = utils.priceFilterConfig(minPrice as string, maxPrice as string);
-    const sortConfig = utils.sortConfig(sort); // Não posso enviar um undefined para sort
-    const skipItemsConfig = utils.skipItemsConfig(items_per_page, pageQuery);
+{   
+    const skipItemsConfig = ITEMS_PER_PAGE * ((Number(request.query.page) - 1));    
+    const sort = ITEM_SORT[request.query.order as string]
+    const priceFilter = utils.priceFilter(request.query.max_price as string, request.query.min_price as string)
+    const filteredData = utils.queryParamsConfig (
+        request.params.state,
+        request.params.category, 
+        request.params.sub_category,
+        request.query.userId,
+        request.query.title,
+        priceFilter,
+    )
 
-    const executeProcess = new Promise((resolve,) => resolve(utils.queryParamsConfig(
-        state,
-        category, 
-        sub_category,
-        userId,
-        title,
-        priceFilterConfig,
-    )))
-
-    await executeProcess
-    .then( objectQuery => utils.requestData(
-        sortConfig,
-        items_per_page,
-        skipItemsConfig,
-        objectQuery
-    ))
-    .then(resultQuery => response.json(resultQuery))
-    .catch(error => {
-        const errorReason: string = error.toString().slice(6);  
-        const errorReasonJson = JSON.parse(errorReason);
-        next(errorReasonJson);
-    });    
+    const result_query = await utils.query(filteredData, sort, skipItemsConfig)
+    .catch((error: any) => {            
+        const serverError = { status: 500, message: "Ocorreu algum erro no servidor."}
+        throw new Error(JSON.stringify(serverError));
+    }); 
+    response.json(result_query)     
  };
 
 
-async function searchCategory( req : Request, res : Response)
+async function searchCategory( request : Request, response : Response)
 {
-    const state_param = req.params.state;
-    const category_param = req.params.category;
-    const title_query = req.query.title;
-    const actual_page = parseInt(req.query.page as string);
-    const max_price = req.query.max_price as string; // Me certificar de nunca enviar valor nulo
-    const min_price = req.query.min_price as string;
-    const order = req.query.order as string;
-    let order_config : any = {}
-    switch(order){
-        case 'low-price-first': 
-            order_config['price'] = 1;
-            break;
-        case 'higher-price-first':
-            order_config['price'] = -1;
-            break;
-        case 'most-relevant-first':
-            order_config['likes'] = -1;
-            break;
-        case 'most-recent-first':
-            order_config['date_created'] = -1;
-    };    
-    const skip_items = items_per_page * (actual_page - 1);    
-    let price_config : { $gte? : number, $lte? : number } = {};
-    min_price? price_config.$gte = parseFloat(min_price) : null;
-    max_price? price_config.$lte = parseFloat(max_price) : null;
-    const obj = {
-        'address.state' : state_param === 'Todos'? null:{$regex : state_param, $options : 'i'},
-        'category.name' : { $regex : category_param, $options :'i' },
-        title : title_query? {$regex : title_query, $options : 'i'}:null,
-        price : Object.values(price_config).length? price_config : null,
-    };
-    const obj_query = Object.values(obj).reduce((accumulator : any, value, index) => {
-        value? accumulator[Object.keys(obj)[index]] = value : null;
-        return accumulator;
-    }, {});   
-        
-    const result_query = await ads.find(obj_query).sort(order_config).limit(items_per_page).skip(skip_items);
-    res.json( result_query );
+    const skipItemsConfig = ITEMS_PER_PAGE * ((Number(request.query.page) - 1));    
+    const sort = ITEM_SORT[request.query.order as string]
+    const priceFilter = utils.priceFilter(request.query.max_price as string, request.query.min_price as string)
+    const filteredData = utils.queryParamsConfig (
+        request.params.state,
+        request.params.category, 
+        request.params.sub_category,
+        request.query.userId,
+        request.query.title,
+        priceFilter,
+    )
 
+    const result_query = await utils.query(filteredData, sort, skipItemsConfig)
+    .catch((error: any) => {            
+        const serverError = { status: 500, message: "Ocorreu algum erro no servidor."}
+        throw new Error(JSON.stringify(serverError));
+    }); 
+    response.json(result_query)     
 };
 
 
-async function searchSubCategory( req : Request, res : Response)
+async function searchSubCategory( request : Request, response : Response)
 {
-    const state_param = req.params.state;
-    const category_param = req.params.category;
-    const sub_category_param = req.params.sub_category;
-    const title_query = req.query.title;
-    const actual_page = parseInt(req.query.page as string);
-    const max_price = req.query.max_price as string; // Me certificar de nunca enviar valor nulo
-    const min_price = req.query.min_price as string;
-    const order = req.query.order as string;
-    let order_config : any = {}
-    switch(order){
-        case 'low-price-first': 
-            order_config['price'] = 1;
-            break;
-        case 'higher-price-first':
-            order_config['price'] = -1;
-            break;
-        case 'most-relevant-first':
-            order_config['likes'] = -1;
-            break;
-        case 'most-recent-first':
-            order_config['date_created'] = -1;
-    };    
-    const skip_items = items_per_page * (actual_page - 1);    
-    let price_config : { $gte? : number, $lte? : number } = {};
-    min_price? price_config.$gte = parseFloat(min_price) : null;
-    max_price? price_config.$lte = parseFloat(max_price) : null;
-    const obj = {
-        'address.state' : state_param === 'Todos'? null:{$regex: state_param, $options: 'i'},
-        'category.sub_category.name': {$regex : sub_category_param, $options: 'i'},
-        title : title_query? {$regex: title_query, $options: 'i'}:null,
-        price : Object.values(price_config).length? price_config : null,
-    };
-    const obj_query = Object.values(obj).reduce((accumulator : any, value, index) => {
-        value? accumulator[Object.keys(obj)[index]] = value : null;
-        return accumulator;
-    }, {});      
-    const result_query = await ads.find(obj_query).sort(order_config).limit(items_per_page).skip(skip_items);
-    res.json( result_query );
+    const skipItemsConfig = ITEMS_PER_PAGE * ((Number(request.query.page) - 1));    
+    const sort = ITEM_SORT[request.query.order as string]
+    const priceFilter = utils.priceFilter(request.query.max_price as string, request.query.min_price as string)
+    const filteredData = utils.queryParamsConfig (
+        request.params.state,
+        request.params.category, 
+        request.params.sub_category,
+        request.query.userId,
+        request.query.title,
+        priceFilter,
+    )
+
+    const result_query = await utils.query(filteredData, sort, skipItemsConfig)
+    .catch((error: any) => {            
+        const serverError = { status: 500, message: "Ocorreu algum erro no servidor."}
+        throw new Error(JSON.stringify(serverError));
+    }); 
+    response.json(result_query)     
 };
 
 
-export default { singleAds, getAllAds, search, searchCategory, searchSubCategory };
+export default { singleAds, getAllAds, search, searchCategory, searchSubCategory, createAd };

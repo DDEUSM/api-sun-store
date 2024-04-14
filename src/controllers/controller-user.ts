@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt';
 import users from '../models/User';
 import User from '../models/User';
 import env from '../env';
-import { adaptDateToDatabase, capitalizeWords } from '../utils';
+import { adaptDateToDatabase, capitalizeWords, imageUrlDestiny } from '../utils';
 import mongoose from 'mongoose';
 import { ObjectId } from 'mongodb';
 import { compressImages } from './config/imageCompressor';
@@ -57,13 +57,11 @@ async function createNewUser( req : Request, res : Response )
         return;
     }
 
-    console.log(adaptDateToDatabase(birth))
-
     const salt = await bcrypt.genSalt(12);
     const password_hash = await bcrypt.hash(password, salt);
     const new_user = new users({
         name : capital_name,
-        birth: adaptDateToDatabase(birth),
+        birth: adaptDateToDatabase(new Date (birth)),
         cpf,
         sex,
         email : email_lower_case,
@@ -130,16 +128,14 @@ async function uploadProfileImage(req: Request, res: Response)
     const { file } = req;
     const { id } = req.params;
     
-    const inputPath = "public/temp-images/"+file?.filename;
+    const inputPath = "public/temp-images/profiles/"+file?.filename;
     const outputPath = "public/images/users/"; 
-    const rawName = file?.filename.split(".")[0] as string;    
 
-    const finalImageUrl = compressImages(inputPath, outputPath, rawName);
-
-    const formatedUrl = (finalImageUrl.replaceAll("/", "\\")).replace("public\\", "")
-    await User.findByIdAndUpdate(id, { profile_img: `http://${env.ADDRESS}:${env.PORT}\\${formatedUrl}`})
+    const urlDestiny: string = imageUrlDestiny(inputPath, outputPath, file)
+    await User.findByIdAndUpdate(id, { profile_img: urlDestiny })
 
     return res.status(200).json()
 }
 
 export default { getAllUsers, getUser, createNewUser, userLogin, uploadProfileImage };
+

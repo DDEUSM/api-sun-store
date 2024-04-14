@@ -24,7 +24,6 @@ userRoutes.post('/user/edit-ads' ,controller_user_ads.editAds );
 userRoutes.post('/user/all-user-ads' ,controller_user_ads.userAds );
 userRoutes.delete('/user/delete-ads' ,controller_user_ads.newAds );
 
-
 userRoutes.post('/user/visualize-ad', controller_user_ads.visuazileAds );
 userRoutes.get("/search/:state", controller_ads.search);
 userRoutes.get("/search/:state/:category", controller_ads.searchCategory);
@@ -32,7 +31,7 @@ userRoutes.get("/search/:state/:category/:sub_category", controller_ads.searchSu
 
 userRoutes.post('/user/favorite-or-desfavorite-ad', controller_user_ads.favoriteOrDesfavoriteAd );
 
-userRoutes.post('/user/upload-profile-image/:id', upload.single("profileImage"), controller_user.uploadProfileImage);
+userRoutes.post('/user/upload-profile-image/:id', upload.single("image"), controller_user.uploadProfileImage);
 
 //user_routes.post('/user/deslike-ads' ,controller_user_ads.deslikeAds );
 

@@ -1,3 +1,6 @@
+import { compressImages } from "../controllers/config/imageCompressor";
+import env from "../env";
+
 export function capitalizeWords(name: string)
 {    
     return name.toLowerCase().split(' ').map((word : string) => 
@@ -7,7 +10,15 @@ export function capitalizeWords(name: string)
     }).toString().replaceAll(',',' ');
 }
 
-export function adaptDateToDatabase(date: string)
+export function adaptDateToDatabase(date: Date)
 {    
-    return new Date(date).toLocaleDateString("pt-br").replaceAll("/", "-")
+    return date.toLocaleDateString("pt-br").replaceAll("/", "-")
+}
+
+export function imageUrlDestiny(inputPath: string, outputPath: string, file: any)
+{
+    const rawName = file?.filename.split(".")[0] as string;    
+    const finalImageUrl = compressImages(inputPath, outputPath, rawName);
+    const formatedUrl = (finalImageUrl.replaceAll("/", "\\")).replace("public\\", "")
+    return `http://${env.ADDRESS}:${env.PORT}\\${formatedUrl}`
 }

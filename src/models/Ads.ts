@@ -29,7 +29,7 @@ export interface IAds {
     status : boolean,
     title : string,
     views : number,
-    url_img : [string],
+    url_image : [string],
 };
 
 type AdsModelType = Model<IAds>;
@@ -58,7 +58,7 @@ const adsSchema = new Schema<IAds>({
     status : {type : Boolean},
     title : {type : String},
     views : {type : Number},
-    url_img : {type : [String]}
+    url_image : {type : [String]}
 });
 
 export default model<IAds, AdsModelType>('ads', adsSchema);

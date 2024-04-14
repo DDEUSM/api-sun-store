@@ -1,25 +1,25 @@
 import multer from 'multer';
 import fs from 'fs';
 
+const temporaryPaths: {[fieldName: string]: string} = {
+    'profile_image' : './public/temp-images/profiles/',
+    'product_image' : './public/temp-images/products/'
+}
+
+function toTemporaryPath(fieldName: string, cb: Function)
+{
+    const path = temporaryPaths[fieldName]
+    fs.access(path, (error) => 
+    {
+        if (error) fs.mkdirSync(path)
+    })
+    cb(null, path)
+}
 
 const storage = multer.diskStorage ({
     destination : (req, file, cb) => 
-    {           
-        if(file.fieldname === 'product-images')
-        {
-            cb(null, './public/images/product-test');
-        }
-        else if(file.fieldname === 'profileImage')
-        {
-            fs.access("./public/temp-images", (error) => 
-            {
-                if (error)
-                {
-                    fs.mkdirSync("./public/temp-images");
-                }
-            });
-            cb(null, './public/temp-images');                    
-        }
+    {                
+        toTemporaryPath(file.fieldname, cb)
     },
     filename : (req, file, cb) => 
     {
@@ -29,11 +29,10 @@ const storage = multer.diskStorage ({
     }
 });
 
-
 const limits = {
     fileSize: 550000
 }
 
 
-export const upload = multer({ storage, limits });
+export const upload = multer({ storage });
 
