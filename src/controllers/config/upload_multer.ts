@@ -2,13 +2,14 @@ import multer from 'multer';
 import fs from 'fs';
 
 const temporaryPaths: {[fieldName: string]: string} = {
-    'profile_image' : './public/temp/',
-    'product_image' : './public/temp/'
+    'profile_image' : './temp/',
+    'product_image' : './temp/'
 }
 
 function toTemporaryPath(fieldName: string, cb: Function)
 {
     const path = temporaryPaths[fieldName]
+    /*
     fs.access(path, (error) => 
     {
         if (error) 
@@ -16,6 +17,7 @@ function toTemporaryPath(fieldName: string, cb: Function)
             fs.mkdirSync(path)
         }
     })
+    */
     cb(null, path)
 }
 

@@ -18,14 +18,16 @@ export function compressImages(inputPath: string, outputPath: string, filename: 
             console.log(completed);
             console.log(statistic);
             console.log("-------------");
+            /*
             try 
             {
                 fs.unlinkSync(inputPath)    
-            } 
+            }             
             catch (error) 
             {
                 throw new Error;
             }
+            */
         }
     )
 
