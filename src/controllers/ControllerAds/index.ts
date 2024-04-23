@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response, query } from "express";
+import { NextFunction, Request, Response } from "express";
 import ads from "../../models/Ads";
 import { ITEMS_PER_PAGE, ITEM_SORT } from "../global-data";
 import User from "../../models/User";
@@ -15,14 +15,14 @@ async function createAd (req: Request, res: Response, next: NextFunction)
 
     const inputPath = "public/temp-images/products/"+file?.filename
     const outputPath = "public/images/products/"
-
+    
     const imageUrl = imageUrlDestiny(inputPath, outputPath, file)
     adData.url_image = imageUrl
-
     const adaptedData = adAdapterToDb(adData)
 
     const newAd = new Ads(adaptedData)
     await newAd.save()
+    res.status(200)
 }
 
 async function singleAds( req: Request, res: Response, next: NextFunction )
@@ -119,5 +119,10 @@ async function searchSubCategory( request : Request, response : Response)
     response.json(result_query)     
 };
 
+async function uploadImagetest(request : Request, response : Response) 
+{
+    
+}
 
-export default { singleAds, getAllAds, search, searchCategory, searchSubCategory, createAd };
+
+export default { singleAds, getAllAds, search, searchCategory, searchSubCategory, createAd, uploadImagetest };

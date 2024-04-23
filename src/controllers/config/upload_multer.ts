@@ -2,8 +2,8 @@ import multer from 'multer';
 import fs from 'fs';
 
 const temporaryPaths: {[fieldName: string]: string} = {
-    'profile_image' : './public/temp-images/profiles/',
-    'product_image' : './public/temp-images/products/'
+    'profile_image' : './public/temp/',
+    'product_image' : './public/temp/'
 }
 
 function toTemporaryPath(fieldName: string, cb: Function)
@@ -11,14 +11,17 @@ function toTemporaryPath(fieldName: string, cb: Function)
     const path = temporaryPaths[fieldName]
     fs.access(path, (error) => 
     {
-        if (error) fs.mkdirSync(path)
+        if (error) 
+        {
+            fs.mkdirSync(path)
+        }
     })
     cb(null, path)
 }
 
 const storage = multer.diskStorage ({
     destination : (req, file, cb) => 
-    {                
+    {               
         toTemporaryPath(file.fieldname, cb)
     },
     filename : (req, file, cb) => 
@@ -33,6 +36,5 @@ const limits = {
     fileSize: 550000
 }
 
-
-export const upload = multer({ storage });
+export const upload = multer({ storage, limits });
 

@@ -1,14 +1,12 @@
 import express, {ErrorRequestHandler, Request, Response} from 'express';
 import path from 'path';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import routes from './routes/api-routes';
 import connect_database from './instances/mongo-cluster-instance';
 import passport from 'passport';
 import userRoutes from './routes/api-user-routes';
 import env from './env';
 import { MulterError } from 'multer';
-
 
 const server = express();
 connect_database();
@@ -40,4 +38,4 @@ const errorHandler : ErrorRequestHandler = (err, req, res, next) => {
     } 
 }
 server.use( errorHandler );
-server.listen(env.PORT, () => console.log(`link: http://localhost:${env.PORT}`));
+server.listen(env.PORT, () => console.log(`link: http://${env.HOST}:${env.PORT}`));

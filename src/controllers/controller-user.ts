@@ -67,7 +67,7 @@ async function createNewUser( req : Request, res : Response )
         email : email_lower_case,
         password_hash,
         state,
-        profile_img: `http://${env.ADDRESS}:${env.PORT}/images/users/default.jpg`
+        profile_img: `http://${env.HOST}:${env.PORT}/images/users/default.jpg`
     });
 
     new_user._id = new ObjectId()
@@ -128,10 +128,11 @@ async function uploadProfileImage(req: Request, res: Response)
     const { file } = req;
     const { id } = req.params;
     
-    const inputPath = "public/temp-images/profiles/"+file?.filename;
-    const outputPath = "public/images/users/"; 
+    const inputPath = "public/temp/"+file?.filename;
+    const outputPath = "public/temp/"; 
 
     const urlDestiny: string = imageUrlDestiny(inputPath, outputPath, file)
+    console.log(urlDestiny)
     await User.findByIdAndUpdate(id, { profile_img: urlDestiny })
 
     return res.status(200).json()

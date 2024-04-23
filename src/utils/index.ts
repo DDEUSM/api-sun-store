@@ -20,5 +20,5 @@ export function imageUrlDestiny(inputPath: string, outputPath: string, file: any
     const rawName = file?.filename.split(".")[0] as string;    
     const finalImageUrl = compressImages(inputPath, outputPath, rawName);
     const formatedUrl = (finalImageUrl.replaceAll("/", "\\")).replace("public\\", "")
-    return `http://${env.ADDRESS}:${env.PORT}\\${formatedUrl}`
+    return `http://${env.HOST}:${env.PORT}\\${formatedUrl}`
 }

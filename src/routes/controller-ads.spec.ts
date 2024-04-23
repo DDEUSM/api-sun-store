@@ -1,10 +1,9 @@
-import ControllerAds from "../controllers/ControllerAds"
 import Axios from "axios"
 import env from "../env"
 
 describe("ad tests", () => 
 {
-    const url = "http://"+env.ADDRESS+":"+env.PORT
+    const url = "http://"+env.HOST+":"+env.PORT
     test("get an ad by id", async () => 
     {
         const ad = {
